@@ -1,8 +1,24 @@
+/**
+ * @file LoadBalancer.cpp
+ * @brief Implementation of the LoadBalancer class logic.
+ */
+
 #include "LoadBalancer.h"
 #include <iostream>
 #include <sstream>
 #include <vector>
 
+#define YELLOW "\033[33m"
+#define RED "\033[31m"
+#define GREEN "\033[32m"
+#define BOLD "\033[1m"
+#define RESET "\033[0m"
+
+/**
+ * @brief Helper function to convert a string IP address to a numeric long.
+ * @param ip The string representation of the IP (e.g., "192.168.1.1").
+ * @return The unsigned long representation of the IP.
+ */
 unsigned long LoadBalancer::ipToLong(std::string ip) {
     unsigned int a, b, c, d;
     char dot;
@@ -11,6 +27,10 @@ unsigned long LoadBalancer::ipToLong(std::string ip) {
     return (a << 24) + (b << 16) + (c << 8) + d;
 }
 
+/**
+ * @brief Constructor for the Load Balancer.
+ * Sets up initial servers and the firewall range.
+ */
 LoadBalancer::LoadBalancer(int num_servers, std::string start_ip, std::string end_ip) 
     : system_time(0), cooldown_remaining(0), cooldown_period(num_servers), total_requests_received(0), rejected_requests(0) {
     range_start = ipToLong(start_ip);
@@ -25,6 +45,10 @@ LoadBalancer::~LoadBalancer() {
     for (auto s : servers) delete s;
 }
 
+/**
+ * @brief Logic for adding a request and firewall check.
+ * Logs blocked requests in red.
+ */
 void LoadBalancer::add_request(Request r) {
     total_requests_received++;
     unsigned long incoming_ip = ipToLong(r.ip_in);
@@ -50,6 +74,10 @@ void LoadBalancer::remove_server() {
     }
 }   
 
+/**
+ * @brief Dynamic scaling logic.
+ * Checks queue thresholds and manages the n-cycle cooldown.
+ */
 void LoadBalancer::balance_check() {
     if (cooldown_remaining > 0) {
         cooldown_remaining--;
@@ -71,6 +99,9 @@ void LoadBalancer::balance_check() {
     }
 }
 
+/**
+ * @brief Generates the final simulation report.
+ */
 void LoadBalancer::print_summary(int total_cycles) {
     int active = 0;
     for (auto s : servers) if (s->is_busy()) active++;
