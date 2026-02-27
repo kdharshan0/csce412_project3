@@ -54,7 +54,7 @@ void LoadBalancer::add_request(Request r) {
     unsigned long incoming_ip = ipToLong(r.ip_in);
 
     if (incoming_ip >= range_start && incoming_ip <= range_end) {
-        std::cout << "[FIREWALL] Blocked Range IP: " << r.ip_in << std::endl;
+        std::cout << RED << "[FIREWALL] Blocked Range IP: " << r.ip_in << RESET << std::endl;
         rejected_requests++;
         return;
     }
@@ -63,14 +63,14 @@ void LoadBalancer::add_request(Request r) {
 
 void LoadBalancer::add_server() {
     servers.push_back(new WebServer('A' + servers.size()));
-    std::cout  << "Adding server.   Total: " << servers.size() << std::endl;
+    std::cout << YELLOW <<  "Adding server.   Total: " << servers.size() << RESET << std::endl;
 }
 
 void LoadBalancer::remove_server() {
     if (servers.size() > 1) {
         delete servers.back();
         servers.pop_back();
-        std::cout << "Removing server. Total: " << servers.size() << std::endl;
+        std::cout << YELLOW << "Removing server. Total: " << servers.size() << RESET << std::endl;
     }
 }   
 
@@ -106,12 +106,12 @@ void LoadBalancer::print_summary(int total_cycles) {
     int active = 0;
     for (auto s : servers) if (s->is_busy()) active++;
 
-    std::cout << "\n" << "Simulation Summary" << "\n";
+    std::cout << "\n" << BOLD << "Simulation Summary" << RESET << "\n";
     std::cout << "Cycles Run:         " << total_cycles << "\n";
     std::cout << "Total Requests:     " << total_requests_received << "\n";
-    std::cout << "Blocked Requests:   " << rejected_requests << "\n";
+    std::cout << "Blocked Requests:   " << RED << rejected_requests << RESET << "\n";
     std::cout << "Queue Remaining:    " << request_queue.size() << "\n";
     std::cout << "Final Server Count: " << servers.size() << "\n";
-    std::cout << "Active Servers:     " << active << "\n";
+    std::cout << "Active Servers:     " << GREEN << active << RESET "\n";
     std::cout << "Idle Servers:       " << (servers.size() - active) << "\n";
 }
